@@ -138,4 +138,6 @@ dmypy.json
 cython_debug/
 
 *.ico
-.output/*
+.output
+output/
+.idea
