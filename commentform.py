@@ -193,9 +193,9 @@ class Ui_MainWindow(object):
         self.good_action = QtWidgets.QCheckBox(self.gridLayoutWidget)
         self.good_action.setObjectName("good_action")
         self.gridLayout.addWidget(self.good_action, 6, 0, 1, 1)
-        self.good_hw_3 = QtWidgets.QCheckBox(self.gridLayoutWidget)
-        self.good_hw_3.setObjectName("good_hw_3")
-        self.gridLayout.addWidget(self.good_hw_3, 6, 2, 1, 1)
+        self.hardworker = QtWidgets.QCheckBox(self.gridLayoutWidget)
+        self.hardworker.setObjectName("hardworker")
+        self.gridLayout.addWidget(self.hardworker, 6, 2, 1, 1)
         self.distracted = QtWidgets.QCheckBox(self.gridLayoutWidget)
         self.distracted.setObjectName("distracted")
         self.gridLayout.addWidget(self.distracted, 7, 0, 1, 1)
@@ -215,19 +215,43 @@ class Ui_MainWindow(object):
         self.send_comment.clicked.connect(self.send)
         self.text_comment.setReadOnly(True)
 
+        self.responsible.stateChanged.connect(
+            lambda state=self.responsible.isChecked(), which='responsible': self.changeCheckBoxState(state, which))
+
+        self.irresponsible.stateChanged.connect(
+            lambda state=self.irresponsible.isChecked(), which='irresponsible': self.changeCheckBoxState(state, which))
+
+        self.bad_action.stateChanged.connect(
+            lambda state=self.bad_action.isChecked(), which='bad_action': self.changeCheckBoxState(state, which))
+
+        self.good_action.stateChanged.connect(
+            lambda state=self.good_action.isChecked(), which='good_action': self.changeCheckBoxState(state, which))
+
+        self.bad_hw.stateChanged.connect(
+            lambda state=self.bad_hw.isChecked(), which='bad_hw': self.changeCheckBoxState(state, which))
+
+        self.good_hw.stateChanged.connect(
+            lambda state=self.good_hw.isChecked(), which='good_hw': self.changeCheckBoxState(state, which))
+
+        self.active.stateChanged.connect(
+            lambda state=self.active.isChecked(), which='active': self.changeCheckBoxState(state, which))
+
+        self.distracted.stateChanged.connect(
+            lambda state=self.distracted.isChecked(), which='distracted': self.changeCheckBoxState(state, which))
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Logbook comments"))
         self.label.setText(_translate("MainWindow",
-                                      "<html><head/><body><p align=\"center\">Доступные</p><p align=\"center\">Группы</p></body></html>"))
+        "<html><head/><body><p align=\"center\">Доступные</p><p align=\"center\">Группы</p></body></html>"))
         self.label_2.setText(
-            _translate("MainWindow", "<html><head/><body><p align=\"center\">Выберите студента</p></body></html>"))
+        _translate("MainWindow", "<html><head/><body><p align=\"center\">Выберите студента</p></body></html>"))
         self.label_3.setText(
-            _translate("MainWindow", "<html><head/><body><p align=\"center\">Выберите предмет</p></body></html>"))
+        _translate("MainWindow", "<html><head/><body><p align=\"center\">Выберите предмет</p></body></html>"))
         self.label_4.setText(
-            _translate("MainWindow", "<html><head/><body><p align=\"center\">Существующие отзывы</p></body></html>"))
+        _translate("MainWindow", "<html><head/><body><p align=\"center\">Существующие отзывы</p></body></html>"))
         self.label_5.setText(_translate("MainWindow",
-                                        "<html><head/><body><p align=\"center\">Блок </p><p align=\"center\">Информации</p></body></html>"))
+        "<html><head/><body><p align=\"center\">Блок </p><p align=\"center\">Информации</p></body></html>"))
         self.label_6.setText(_translate("MainWindow", "Имя:"))
         self.label_7.setText(_translate("MainWindow", "Группа:"))
         self.group_label_info.setText(_translate("MainWindow", "???????"))
@@ -237,7 +261,7 @@ class Ui_MainWindow(object):
         self.send_comment.setText(_translate("MainWindow", "Отправить отзыв"))
         self.label_11.setText(_translate("MainWindow", "Создать отзыв"))
         self.label_12.setText(_translate("MainWindow", "Developed by GendalfBlack, Glitch33r"))
-        self.label_13.setText(_translate("MainWindow", "v1.1"))
+        self.label_13.setText(_translate("MainWindow", "v1.1.1"))
         self.irresponsible.setText(_translate("MainWindow", "Безответственный"))
         self.curious.setText(_translate("MainWindow", "Любопытный"))
         self.good_theme.setText(_translate("MainWindow", "Отлично\nразобрался в теме"))
@@ -249,9 +273,45 @@ class Ui_MainWindow(object):
         self.creative.setText(_translate("MainWindow", "Креативный"))
         self.good_hw.setText(_translate("MainWindow", "Положительное дз"))
         self.good_action.setText(_translate("MainWindow", "Положительное поведение"))
-        self.good_hw_3.setText(_translate("MainWindow", "Трудолюбивость"))
+        self.hardworker.setText(_translate("MainWindow", "Трудолюбивость"))
         self.distracted.setText(_translate("MainWindow", "Отвлекается"))
         self.treeWidget.headerItem().setHidden(True)
+
+    def changeCheckBoxState(self, toggle, which):
+        if toggle == QtCore.Qt.Checked:
+            if which == "responsible":
+                self.irresponsible.setEnabled(False)
+            if which == "irresponsible":
+                self.responsible.setEnabled(False)
+            if which == "bad_action":
+                self.good_action.setEnabled(False)
+            if which == "good_action":
+                self.bad_action.setEnabled(False)
+            if which == "good_hw":
+                self.bad_hw.setEnabled(False)
+            if which == "bad_hw":
+                self.good_hw.setEnabled(False)
+            if which == "active":
+                self.distracted.setEnabled(False)
+            if which == "distracted":
+                self.active.setEnabled(False)
+        elif toggle == QtCore.Qt.Unchecked:
+            if which == "responsible":
+                self.irresponsible.setEnabled(True)
+            if which == "irresponsible":
+                self.responsible.setEnabled(True)
+            if which == "bad_action":
+                self.good_action.setEnabled(True)
+            if which == "good_action":
+                self.bad_action.setEnabled(True)
+            if which == "good_hw":
+                self.bad_hw.setEnabled(True)
+            if which == "bad_hw":
+                self.good_hw.setEnabled(True)
+            if which == "active":
+                self.distracted.setEnabled(True)
+            if which == "distracted":
+                self.active.setEnabled(True)
 
     def generate_comment(self):
         self.text_comment.clear()
@@ -328,7 +388,7 @@ class Ui_MainWindow(object):
                  "Поведение на парах претензий не вызывает :)",
                  "Поведение на парах всегда отличное"]
             ) + ". "
-        if self.good_hw_3.isChecked():
+        if self.hardworker.isChecked():
             comment += random.choice(
                 ["Усердно работал над каждой темой",
                  "Каждая из работ стоит отдельного внимания",
@@ -343,6 +403,7 @@ class Ui_MainWindow(object):
                  "Задает интересные вопросы, однако не всегда по теме",
                  "Может отвлекаться на посторонние разговоры или другую деятельность"]
             ) + ". "
+
         if comment == '':
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
