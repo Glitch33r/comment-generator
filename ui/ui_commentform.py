@@ -198,7 +198,7 @@ class Ui_MainWindow(object):
         self.send_comment.setText(_translate("MainWindow", "Отправить отзыв"))
         self.label_11.setText(_translate("MainWindow", "Создать отзыв"))
         self.label_12.setText(_translate("MainWindow", "Developed by GendalfBlack, Glitch33r"))
-        self.label_13.setText(_translate("MainWindow", "v1.1.1"))
+        self.label_13.setText(_translate("MainWindow", "v1.1.2"))
         self.irresponsible.setText(_translate("MainWindow", "Безответственный"))
         self.curious.setText(_translate("MainWindow", "Любопытный"))
         self.good_theme.setText(_translate("MainWindow", "Отлично\nразобрался в теме"))
