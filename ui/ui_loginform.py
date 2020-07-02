@@ -9,12 +9,6 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMessageBox
-
-from commentform import Ui_MainWindow
-from parse_comment import CommentBot
-
-bot = CommentBot()
 
 class Ui_login_window(object):
     def setupUi(self, login_window):
@@ -53,9 +47,6 @@ class Ui_login_window(object):
         font.setPointSize(12)
         self.login_btn.setFont(font)
         self.login_btn.setObjectName("login_btn")
-
-        self.login_btn.clicked.connect(self.login_button)
-
         self.title_label = QtWidgets.QLabel(login_window)
         self.title_label.setGeometry(QtCore.QRect(70, 40, 231, 41))
         font = QtGui.QFont()
@@ -75,23 +66,6 @@ class Ui_login_window(object):
         self.password_label.setText(_translate("login_window", "Password"))
         self.login_btn.setText(_translate("login_window", "LOGIN"))
         self.title_label.setText(_translate("login_window", "LogIn to Logbook"))
-
-    def login_button(self):
-        result = bot.login(self.username_lineEdit.text(), self.password_lineEdit.text())
-
-        if result:
-            self.window = QtWidgets.QMainWindow()
-            self.ui = Ui_MainWindow()
-            self.ui.setupUi(self.window, self.username_lineEdit.text(), self.password_lineEdit.text())
-            self.window.show()
-            login_window.hide()
-        else:
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Information)
-            msg.setWindowTitle("Login")
-            msg.setText("Your password and/or login are  wrong! Try again")
-            msg.exec_()
-
 
 
 if __name__ == "__main__":
