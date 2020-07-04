@@ -3,6 +3,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QTreeWidgetItem, QMessageBox
 from ui.ui_commentform import Ui_MainWindow
 from logbook_connection import CommentBot
+from .phrases import PHRASES
 
 bot = CommentBot()
 groups = []
@@ -22,6 +23,8 @@ class GeneratorFormWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self, username, password)
         self.show()
 
+        self.language = 'ru'
+
         self.checkboxes = {
             'responsible': self.irresponsible,
             'irresponsible': self.responsible,
@@ -39,23 +42,31 @@ class GeneratorFormWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.subject_list.itemSelectionChanged.connect(self.subject_changed)
         self.gen_comment.clicked.connect(self.generate_comment)
         self.send_comment.clicked.connect(self.send)
+        self.ua_lang.toggled.connect(self.changeLanguageToUa)
+        self.ru_lang.toggled.connect(self.changeLanguageToRu)
 
         self.responsible.stateChanged.connect(
-            lambda state=self.responsible.isChecked(), elem=self.responsible.objectName(): self.changeCheckBoxState(state, elem))
+            lambda state=self.responsible.isChecked(), elem=self.responsible.objectName(): self.changeCheckBoxState(
+                state, elem))
         self.irresponsible.stateChanged.connect(
-            lambda state=self.irresponsible.isChecked(), elem=self.irresponsible.objectName(): self.changeCheckBoxState(state, elem))
+            lambda state=self.irresponsible.isChecked(), elem=self.irresponsible.objectName(): self.changeCheckBoxState(
+                state, elem))
         self.bad_action.stateChanged.connect(
-            lambda state=self.bad_action.isChecked(), elem=self.bad_action.objectName(): self.changeCheckBoxState(state, elem))
+            lambda state=self.bad_action.isChecked(), elem=self.bad_action.objectName(): self.changeCheckBoxState(state,
+                                                                                                                  elem))
         self.good_action.stateChanged.connect(
-            lambda state=self.good_action.isChecked(), elem=self.good_action.objectName(): self.changeCheckBoxState(state, elem))
+            lambda state=self.good_action.isChecked(), elem=self.good_action.objectName(): self.changeCheckBoxState(
+                state, elem))
         self.bad_hw.stateChanged.connect(
             lambda state=self.bad_hw.isChecked(), elem=self.bad_hw.objectName(): self.changeCheckBoxState(state, elem))
         self.good_hw.stateChanged.connect(
-            lambda state=self.good_hw.isChecked(), elem=self.good_hw.objectName(): self.changeCheckBoxState(state, elem))
+            lambda state=self.good_hw.isChecked(), elem=self.good_hw.objectName(): self.changeCheckBoxState(state,
+                                                                                                            elem))
         self.active.stateChanged.connect(
             lambda state=self.active.isChecked(), elem=self.active.objectName(): self.changeCheckBoxState(state, elem))
         self.distracted.stateChanged.connect(
-            lambda state=self.distracted.isChecked(), elem=self.distracted.objectName(): self.changeCheckBoxState(state, elem))
+            lambda state=self.distracted.isChecked(), elem=self.distracted.objectName(): self.changeCheckBoxState(state,
+                                                                                                                  elem))
 
     def changeCheckBoxState(self, toggle, elem):
         if toggle == QtCore.Qt.Checked:
@@ -65,96 +76,43 @@ class GeneratorFormWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             if elem in self.checkboxes.keys():
                 self.checkboxes[elem].setEnabled(True)
 
+    def changeLanguageToRu(self, selected):
+        if selected:
+            self.language = 'ru'
+
+    def changeLanguageToUa(self, selected):
+        if selected:
+            self.language = 'ua'
+
     def generate_comment(self):
         self.text_comment.clear()
         comment = ''
         if self.responsible.isChecked():
-            comment += random.choice(
-                ["Прекрасно проявил себя на занятиях",
-                 "Отлично проявляет себя на занятиях",
-                 "Замечательно проявил себя в данном блоке",
-                 "Ответственно отнесся к блоку",
-                 "Проявил себя как ответственный студент"]
-            ) + ". "
+            comment += random.choice(PHRASES[self.language]['responsible']) + ". "
         if self.active.isChecked():
-            comment += random.choice(
-                ["Проявляет себя заинтересованным и всегда вовлечен в работу",
-                 "Берет участие в любой активности, отвечая на вопросы и предоставляя хорошие идеи",
-                 "Быстро справляется с любыми заданиями на отлично!"]
-            ) + ". "
+            comment += random.choice(PHRASES[self.language]['active']) + ". "
         if self.good_theme.isChecked():
-            comment += random.choice(
-                ["Усвоение материала не вызвало никаких проблем",
-                 "С легкостью разобрался со всем материалом блока",
-                 "Студент с легкостью смог разобраться в теме и может использовать полученные знания самостоятельно"]
-            ) + ". "
+            comment += random.choice(PHRASES[self.language]['good_theme']) + ". "
         if self.smart.isChecked():
-            comment += random.choice(
-                ["Студент самостоятельно может применять знания и использовать их в нестандартных ситуациях",
-                 "Может самостоятельно работать над более сложными проектами",
-                 "Является одним из лучших в группе!",
-                 'В числе первых справляется с заданиями, всегда выполняя работу на "отлично"',
-                 "Является примером для всей группы"]
-            ) + ". "
+            comment += random.choice(PHRASES[self.language]['smart']) + ". "
         if self.curious.isChecked():
-            comment += random.choice(
-                ["У студента крайне пытливый ум, что помогает ему справляться с любыми заданиями",
-                 "Всегда задает интересные вопросы",
-                 "Всегда заинтересован в дополнительных знаниях по теме"]
-            ) + ". "
+            comment += random.choice(PHRASES[self.language]['curious']) + ". "
         if self.bad_action.isChecked():
-            comment += random.choice(
-                ["Поведение оставляет желать лучшего",
-                 "Стоит больше внимания уделить поведению"]
-            ) + ". "
+            comment += random.choice(PHRASES[self.language]['bad_action']) + ". "
         if self.bad_hw.isChecked():
-            comment += random.choice(
-                ["К сожалению, следует больше внимания уделить домашним заданиям",
-                 "Больше внимания к домашним заданиям, т.к. с ними есть проблемы",
-                 "Следует больше внимания уделять домашним заданиям"]
-            ) + ". "
+            comment += random.choice(PHRASES[self.language]['bad_hw']) + ". "
         if self.good_hw.isChecked():
-            comment += random.choice(
-                ["Всегда сдает домашние задания на отлично",
-                 "Домашние задания всегда верны и сданы вовремя",
-                 "Работа над домашними заданиями вызывает только восторг",
-                 "Домашние задания всегда выполнены на высшем уровне"]
-            ) + ". "
+            comment += random.choice(PHRASES[self.language]['good_hw']) + ". "
         if self.irresponsible.isChecked():
-            comment += random.choice(
-                ["К изучению темы подошел спустя рукава. Работы сделаны очень поверхностно",
-                 "К сожалению, работа на парах не воспринимается должным образом",
-                 "Плохо работает на парах, что ведет к соответствующим оценкам"]
-            ) + ". "
+            comment += random.choice(PHRASES[self.language]['irresponsible']) + ". "
         if self.creative.isChecked():
-            comment += random.choice(
-                ["Предоставлял оригинальные работы, подходя к каждой теме максимально креативно",
-                 "Оригинально подходит к заданиям", "Всегда находит оригинальные решения",
-                 "Выделяется нестандартными работами на фоне группы",
-                 "Часто выделяется из группы нестандартным подходом",
-                 "Креативно выполняет все работы, о чем могут сказать отличные оценки"]
-            ) + ". "
+            comment += random.choice(PHRASES[self.language]['creative']) + ". "
         if self.good_action.isChecked():
-            comment += random.choice(
-                ["Является примером поведения для всей группы",
-                 "Поведение на парах претензий не вызывает :)",
-                 "Поведение на парах всегда отличное"]
-            ) + ". "
+            comment += random.choice(PHRASES[self.language]['good_action']) + ". "
         if self.hardworker.isChecked():
-            comment += random.choice(
-                ["Усердно работал над каждой темой",
-                 "Каждая из работ стоит отдельного внимания",
-                 "Каждая из работ студента выполнена идеально",
-                 "Работа на парах всегда на высоте",
-                 "На каждом уроке выкладывался на полную",
-                 "Провел достойную работу над каждым из своих проектов"]
-            ) + ". "
+            comment += random.choice(PHRASES[self.language]['hardworker']) + ". "
         if self.distracted.isChecked():
-            comment += random.choice(
-                ["Часто переключает внимание на посторонние темы и не может включиться в работу",
-                 "Задает интересные вопросы, однако не всегда по теме",
-                 "Может отвлекаться на посторонние разговоры или другую деятельность"]
-            ) + ". "
+            comment += random.choice(PHRASES[self.language]['distracted']) + ". "
 
         if comment == '':
             msg = QMessageBox()
