@@ -23,6 +23,8 @@ class GeneratorFormWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self, username, password)
         self.show()
 
+        bot.login(self.username, self.password)
+
         self.language = 'ru'
 
         self.checkboxes = {
@@ -126,7 +128,6 @@ class GeneratorFormWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.text_comment.setText(comment)
 
     def send(self):
-        bot.login(self.username, self.password)
         if all(v != 0 for v in for_send.values()) and self.text_comment.toPlainText() != '':
             result = bot.send_comment(
                 str(for_send['group']),
@@ -161,7 +162,6 @@ class GeneratorFormWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             msg.exec_()
 
     def set_groups(self):
-        bot.login(self.username, self.password)
         for i in bot.get_groups():
             groups.append(i)
             self.group_list.addItem(i['name'])
@@ -179,7 +179,7 @@ class GeneratorFormWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def set_students(self, id):
         self.student_list.clear()
         students.clear()
-        bot.login(self.username, self.password)
+        # bot.login(self.username, self.password)
         for i in bot.get_students_of_group(id):
             students.append(i)
             self.student_list.addItem(i['name'])
@@ -198,14 +198,14 @@ class GeneratorFormWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def set_subjects(self, id):
         self.subject_list.clear()
         subjects.clear()
-        bot.login(self.username, self.password)
+        # bot.login(self.username, self.password)
         for i in bot.get_subjects_for_group(id):
             subjects.append(i)
             self.subject_list.addItem(i['name'])
 
     def set_comments(self, id):
         self.treeWidget.clear()
-        bot.login(self.username, self.password)
+        # bot.login(self.username, self.password)
         for idx, i in enumerate(bot.get_student_comments(id)):
             topItem = QTreeWidgetItem(self.treeWidget)
             topItem.setText(idx, i['teacher'])

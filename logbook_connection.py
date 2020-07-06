@@ -3,30 +3,32 @@ import json
 
 
 class CommentBot:
+    session = requests.Session()
     """Bot for working with student comments in logbook"""
     base_url = "https://logbook.itstep.org/"
     headers = {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                      'Chrome/79.0.3945.130 Safari/537.36 OPR/66.0.3515.115'
+        'x-requested-with': 'XMLHttpRequest',
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json;charset=utf-8',
+        'Origin': 'https://logbook.itstep.org',
+        'Referer': 'https://logbook.itstep.org/login/index',
+        'Cache-Control': 'no-cache',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:79.0) Gecko/20100101 Firefox/79.0'
     }
     cookies = {}
     students = []
 
     def request(self, part_url, payload=None, method='POST'):
         """Unified method for sending requests to server"""
-        s = requests.Session()
-        resp = s.request(method, self.base_url + part_url, headers=self.headers, data=json.dumps(payload),
-                         cookies=self.cookies)
+        resp = self.session.request(method, self.base_url + part_url, headers=self.headers, data=json.dumps(payload))
 
-        self.cookies = resp.cookies
         return resp.json(), resp.content
 
     def login(self, username: str, password: str):
         """Login to logbook"""
         payload = {
             "LoginForm": {
-                "id_city": None,
+                "id_city": '39',
                 "username": username,
                 "password": password
             }
