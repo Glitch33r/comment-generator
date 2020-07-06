@@ -203,7 +203,7 @@ class Ui_MainWindow(object):
         self.send_comment.setText("Отправить отзыв")
         self.label_11.setText("Создать отзыв")
         self.label_12.setText("Developed by GendalfBlack, Glitch33r")
-        self.label_13.setText("v1.2.0")
+        self.label_13.setText("v1.2.1")
         self.irresponsible.setText("Безответственный")
         self.curious.setText("Любознательный")
         self.good_theme.setText("Отлично\nразобрался в теме")
