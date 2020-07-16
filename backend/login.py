@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMessageBox
+
 from backend.generator import GeneratorFormWindow
 from logbook_connection import CommentBot
 from ui.ui_loginform import Ui_login_window
@@ -9,8 +10,9 @@ bot = CommentBot()
 
 class LoginFormWindow(QtWidgets.QMainWindow, Ui_login_window):
 
-    def __init__(self):
+    def __init__(self, db):
         super(LoginFormWindow, self).__init__()
+        self.db = db
         self.setupUi(self)
         self.show()
 
@@ -21,7 +23,7 @@ class LoginFormWindow(QtWidgets.QMainWindow, Ui_login_window):
         result = bot.login(self.username_lineEdit.text(), self.password_lineEdit.text())
 
         if result:
-            GeneratorFormWindow(self.username_lineEdit.text(), self.password_lineEdit.text())
+            GeneratorFormWindow(self.username_lineEdit.text(), self.password_lineEdit.text(), self.db)
             self.hide()
         else:
             msg = QMessageBox()

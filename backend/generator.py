@@ -1,9 +1,13 @@
 import random
+
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QTreeWidgetItem, QMessageBox
-from ui.ui_commentform import Ui_MainWindow
+
 from logbook_connection import CommentBot
-from .phrases import PHRASES
+from ui.ui_commentform import Ui_MainWindow
+from .add_phrase import InsertFormWindow
+
+# from .phrases import PHRASES
 
 bot = CommentBot()
 groups = []
@@ -18,14 +22,15 @@ for_send = {
 
 class GeneratorFormWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
-    def __init__(self, username, password):
+    def __init__(self, username, password, db):
         super(GeneratorFormWindow, self).__init__()
         self.setupUi(self, username, password)
         self.show()
 
         bot.login(self.username, self.password)
-
         self.language = 'ru'
+        self.use = 1
+        self.db = db
 
         self.checkboxes = {
             'responsible': self.irresponsible,
@@ -39,13 +44,17 @@ class GeneratorFormWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         }
 
         self.set_groups()
+        self.special = InsertFormWindow(self.username, db)
         self.group_list.itemSelectionChanged.connect(self.group_changed)
         self.student_list.itemSelectionChanged.connect(self.student_changed)
         self.subject_list.itemSelectionChanged.connect(self.subject_changed)
         self.gen_comment.clicked.connect(self.generate_comment)
         self.send_comment.clicked.connect(self.send)
+        self.add_phrase.clicked.connect(self.add_phrase_window)
         self.ua_lang.toggled.connect(self.changeLanguageToUa)
         self.ru_lang.toggled.connect(self.changeLanguageToRu)
+        self.all_phrases.toggled.connect(self.changeUseToAll)
+        self.own_phrases.toggled.connect(self.changeUseToOwn)
 
         self.responsible.stateChanged.connect(
             lambda state=self.responsible.isChecked(), elem=self.responsible.objectName(): self.changeCheckBoxState(
@@ -86,35 +95,50 @@ class GeneratorFormWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if selected:
             self.language = 'ua'
 
+    def changeUseToAll(self, selected):
+        if selected:
+            self.use = 1
+
+    def changeUseToOwn(self, selected):
+        if selected:
+            self.use = 0
+
     def generate_comment(self):
         self.text_comment.clear()
         comment = ''
+        if self.use:
+            PHRASES = self.db.get_phrases_by_lang(self.language)
+            print('ALL\n', PHRASES)
+        else:
+            PHRASES = self.db.get_phrases_by_user_and_lang(self.username.split('_')[0], self.language)
+            print('By User\n', PHRASES)
+
         if self.responsible.isChecked():
-            comment += random.choice(PHRASES[self.language]['responsible']) + ". "
+            comment += random.choice(PHRASES.get('responsible', [''])) + ". "
         if self.active.isChecked():
-            comment += random.choice(PHRASES[self.language]['active']) + ". "
+            comment += random.choice(PHRASES.get('active', [''])) + ". "
         if self.good_theme.isChecked():
-            comment += random.choice(PHRASES[self.language]['good_theme']) + ". "
+            comment += random.choice(PHRASES.get('good_theme', [''])) + ". "
         if self.smart.isChecked():
-            comment += random.choice(PHRASES[self.language]['smart']) + ". "
+            comment += random.choice(PHRASES.get('smart', [''])) + ". "
         if self.curious.isChecked():
-            comment += random.choice(PHRASES[self.language]['curious']) + ". "
+            comment += random.choice(PHRASES.get('curious', [''])) + ". "
         if self.bad_action.isChecked():
-            comment += random.choice(PHRASES[self.language]['bad_action']) + ". "
+            comment += random.choice(PHRASES.get('bad_action', [''])) + ". "
         if self.bad_hw.isChecked():
-            comment += random.choice(PHRASES[self.language]['bad_hw']) + ". "
+            comment += random.choice(PHRASES.get('bad_hw', [''])) + ". "
         if self.good_hw.isChecked():
-            comment += random.choice(PHRASES[self.language]['good_hw']) + ". "
+            comment += random.choice(PHRASES.get('good_hw', [''])) + ". "
         if self.irresponsible.isChecked():
-            comment += random.choice(PHRASES[self.language]['irresponsible']) + ". "
+            comment += random.choice(PHRASES.get('irresponsible', [''])) + ". "
         if self.creative.isChecked():
-            comment += random.choice(PHRASES[self.language]['creative']) + ". "
+            comment += random.choice(PHRASES.get('creative', [''])) + ". "
         if self.good_action.isChecked():
-            comment += random.choice(PHRASES[self.language]['good_action']) + ". "
+            comment += random.choice(PHRASES.get('good_action', [''])) + ". "
         if self.hardworker.isChecked():
-            comment += random.choice(PHRASES[self.language]['hardworker']) + ". "
+            comment += random.choice(PHRASES.get('hardworker', [''])) + ". "
         if self.distracted.isChecked():
-            comment += random.choice(PHRASES[self.language]['distracted']) + ". "
+            comment += random.choice(PHRASES.get('distracted', [''])) + ". "
 
         if comment == '':
             msg = QMessageBox()
@@ -176,11 +200,10 @@ class GeneratorFormWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         for_send['group'] = str(idx)
         self.set_students(idx)
 
-    def set_students(self, id):
+    def set_students(self, _id):
         self.student_list.clear()
         students.clear()
-        # bot.login(self.username, self.password)
-        for i in bot.get_students_of_group(id):
+        for i in bot.get_students_of_group(_id):
             students.append(i)
             self.student_list.addItem(i['name'])
 
@@ -195,20 +218,18 @@ class GeneratorFormWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.set_subjects(idx)
         self.set_comments(idx)
 
-    def set_subjects(self, id):
+    def set_subjects(self, _id):
         self.subject_list.clear()
         subjects.clear()
-        # bot.login(self.username, self.password)
-        for i in bot.get_subjects_for_group(id):
+        for i in bot.get_subjects_for_group(_id):
             subjects.append(i)
             self.subject_list.addItem(i['name'])
 
-    def set_comments(self, id):
+    def set_comments(self, _id):
         self.treeWidget.clear()
-        # bot.login(self.username, self.password)
-        for idx, i in enumerate(bot.get_student_comments(id)):
+        for idx, i in enumerate(bot.get_student_comments(_id)):
             topItem = QTreeWidgetItem(self.treeWidget)
-            topItem.setText(idx, i['teacher'])
+            topItem.setText(0, i['teacher'])
             subject = QTreeWidgetItem(topItem)
             subject.setText(0, f"Предмет: {i['subject']}")
             comment = QTreeWidgetItem(topItem)
@@ -222,3 +243,8 @@ class GeneratorFormWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 idx = item['id']
 
         for_send['spec'] = int(idx)
+
+    def add_phrase_window(self):
+        self.special.show()
+
+
